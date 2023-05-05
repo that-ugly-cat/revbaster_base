@@ -260,7 +260,7 @@ else:
 
     # here we specify which file to serve
     if len(probable_files) == 0:
-      pdf_file = 'base_pdfs/dang.pdf'
+      pdf_file = 'dang!'
     if len(probable_files) == 1:
       pdf_file = 'pdfs/' + probable_files[0]
     if len(probable_files) > 1:
@@ -290,9 +290,9 @@ else:
           show_pdf(pdf_file)
         else:
           if pdf_file == 'dang!':
-            st.error('Dang!')
+            st.error('Dang! Could not find that pdf file. Apologies about that.')
           if pdf_file == 'doubledang!':
-            st.error('Double dang!')
+            st.error('Double dang! Found more than one file matching that author/title combination. Apologies about that.')
       with col2:
         st.subheader("Assessment")
         ## Include?
