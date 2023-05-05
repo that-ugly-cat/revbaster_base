@@ -277,7 +277,7 @@ else:
           pdf_file = 'pdfs/' + probable_files_title[0]
         if len(probable_files_title) > 1:
           pdf_file = 'doubledang!'
-        st.text(probable_files_title)
+      st.text(probable_files_title)
     #####################################
 
     # Display PDF and assessment fields
