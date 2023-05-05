@@ -272,11 +272,11 @@ else:
         if file.find(first_words)!= -1:
           probable_files_title.append(file)
         if len(probable_files_title) == 0:
-          pdf_file = 'base_pdfs/dang.pdf'
+          pdf_file = 'dang!'
         if len(probable_files_title) == 1:
           pdf_file = 'pdfs/' + probable_files_title[0]
         if len(probable_files_title) > 1:
-          pdf_file = 'base_pdfs/doubledang.pdf'
+          pdf_file = 'doubledang!'
         st.text(probable_files_title)
     #####################################
 
@@ -286,7 +286,13 @@ else:
     with st.container():
       col1, col2 = st.columns([3, 2])
       with col1:
-        show_pdf(pdf_file)
+        if pdf_file not in ['dang!', 'doubledang!']:
+          show_pdf(pdf_file)
+        else:
+          if pdf_file == 'dang!':
+            st.error('Dang!')
+          if pdf_file == 'doubledang!':
+            st.error('Double dang!')
       with col2:
         st.subheader("Assessment")
         ## Include?
