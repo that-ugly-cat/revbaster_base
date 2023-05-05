@@ -1,0 +1,13 @@
+pandas
+streamlit
+openpyxl
+pybase64
+streamlit-aggrid
+supabase
+requests
+mysql-connector-python
+google-cloud-firestore
+wordcloud
+matplotlib
+XlsxWriter
+pyxlsb
