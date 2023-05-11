@@ -331,6 +331,15 @@ else:
             except:
               study_year_value = 0
           study_year_widget = st.number_input('Year', format = '%d', step = 1, value = study_year_value, disabled = auth_widgets)
+        # Health emergency
+        try: 
+          health_emergency = doc_asdict['revmaster_health_emergency']
+          health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+        except:
+          health_emergency = ''
+          health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+
+        
         # Study type
         try: 
           option_study_type = doc_asdict['revmaster_study_type']
@@ -383,7 +392,8 @@ else:
                     'revmaster_country': country_widget, 
                     'revmaster_study_year' : study_year_widget,
                     'revmaster_study_type' : study_type_widget, 
-                    'revmaster_methodology' : methodology_widget}
+                    'revmaster_methodology' : methodology_widget,
+                    'revmaster_health_emergency' : health_emergency_widget}
           for criterion in initial_config.criteria:
             criterion_widget_name = criterion + '_widget'
             criterion_dict_index = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
