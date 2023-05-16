@@ -195,7 +195,7 @@ else:
     return ag
   ####################################
   # Tabs
-  tab1, tab2, tab3, tab4 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)'])
+  tab1, tab2, tab3, tab4, tab5 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'NLP on assessments'])
   ## tab 1 (assessment)###############################################
   with tab1:
     # Main area (paper table)
@@ -460,6 +460,9 @@ else:
     st.pyplot(fig)
     st.bar_chart(data_df, x = 'Keyword', y = 'count')
     st.write(data_df)
+  ## tab 5 (NLP on assessments)###############################################
+  with tab5:
+    papers_df.columns.tolist()
 
 ## sidebar#######################
   ###sidebar 
