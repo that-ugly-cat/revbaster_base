@@ -510,8 +510,8 @@ else:
   for column in ["revmaster_Infodemic__Characterization", "revmaster_Ethical_Issues_in_Infodemic_management", "revmaster_Conclusions_and_recommendations", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Infodemic_management___Characterization", "revmaster_Aims_of_Infodemic_management"]:
     st.subheader(column)
     text = papers_assessed_df[column].values.tolist()
-    text = ' '.join(text)
-    do_lemma_freq(text)
+    st.write(text)
+    #do_lemma_freq(text)
     
 
 ## sidebar#######################
