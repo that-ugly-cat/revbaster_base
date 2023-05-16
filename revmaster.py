@@ -202,7 +202,7 @@ else:
     return ag
   ####################################
   # Tabs
-  tab1, tab2, tab3, tab4, tab5 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'NLP on assessments'])
+  tab1, tab2, tab3, tab4, tab5 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis'])
   ## tab 1 (assessment)###############################################
   with tab1:
     # Main area (paper table)
@@ -467,7 +467,7 @@ else:
     st.pyplot(fig)
     st.bar_chart(data_df, x = 'Keyword', y = 'count')
     st.write(data_df)
-  ## tab 5 (NLP on assessments)###############################################
+  ## tab 5 (analysis)###############################################
   with tab5:
     import spacy
     @st.cache_data
@@ -486,7 +486,10 @@ else:
     revmaster_cols_nlp = [x for x in papers_assessed_df.columns.tolist() if 'revmaster' in x]
     st.write(revmaster_cols_nlp)
     doc = nlp('here in the above we have parsed the text that we have taken for sample by using the model that we have initialized i.e load_model.')
-    st.write(doc)
+    lemmatized_string = []
+    for token in doc:
+      lemmatized_string.append(token.lemma_)
+    st.write(lemmatized_string)
     
 
 ## sidebar#######################
