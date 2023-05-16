@@ -475,9 +475,9 @@ else:
       try:
         nlp = spacy.load(model)
       except OSError:
-        print('Downloading language model for the spaCy POS tagger', file=stderr)
+        print('Downloading language model for the spaCy POS tagger')
         from spacy.cli import download
-      download(model)
+        download(model)
       nlp = spacy.load(model)
       return nlp
     nlp = load_nlp_model('en_core_web_sm')
