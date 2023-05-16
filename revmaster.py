@@ -462,7 +462,8 @@ else:
     st.write(data_df)
   ## tab 5 (NLP on assessments)###############################################
   with tab5:
-    papers_df.columns.tolist()
+    revmaster_cols_nlp = [x for x in papers_df.columns.tolist() if 'revmaster_ in x]
+    st.write(revmaster_cols_nlp)
 
 ## sidebar#######################
   ###sidebar 
