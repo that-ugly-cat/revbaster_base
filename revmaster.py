@@ -169,6 +169,14 @@ else:
     data_df = data_df[['Key', 'Author', 'Publication Year', 'Title', 'Abstract Note', 'Item Type', 'DOI', 'Url', 'Manual Tags']]
     return data_df
   papers_df = load_data(initial_config.firestore_collection)
+  
+   @st.cache_data
+  def load_assessment_data(firestore_collection):
+    data = list(db.collection(firestore_collection).stream())
+    data_dict = list(map(lambda x: x.to_dict(), data))
+    data_df = pd.DataFrame(data_dict)
+    return data_df
+  papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
 
   def export_data(firestore_collection):
     data = list(db.collection(firestore_collection).stream())
@@ -464,7 +472,7 @@ else:
   with tab5:
     revmaster_cols_nlp = [x for x in papers_df.columns.tolist()]
     st.write(revmaster_cols_nlp)
-    st.write(load_data(initial_config.firestore_collection))
+    st.write(papers_assessed_df)
 
 ## sidebar#######################
   ###sidebar 
