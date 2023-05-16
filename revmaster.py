@@ -469,10 +469,25 @@ else:
     st.write(data_df)
   ## tab 5 (NLP on assessments)###############################################
   with tab5:
+    import spacy
+    @st.cache_data
+    def load_nlp_model(model):
+      try:
+        nlp = spacy.load(model)
+      except OSError:
+        print('Downloading language model for the spaCy POS tagger', file=stderr)
+        from spacy.cli import download
+      download(model)
+      nlp = spacy.load(model)
+      return nlp
+    nlp = load_nlp_model('en_core_web_sm')
+    
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     revmaster_cols_nlp = [x for x in papers_assessed_df.columns.tolist() if 'revmaster' in x]
     st.write(revmaster_cols_nlp)
-    st.write(papers_assessed_df)
+    doc = nlp('here in the above we have parsed the text that we have taken for sample by using the model that we have initialized i.e load_model.')
+    st.write(doc)
+    
 
 ## sidebar#######################
   ###sidebar 
