@@ -11,3 +11,4 @@ wordcloud
 matplotlib
 XlsxWriter
 pyxlsb
+spacy
