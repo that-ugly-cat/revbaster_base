@@ -170,13 +170,12 @@ else:
     return data_df
   papers_df = load_data(initial_config.firestore_collection)
   
-   @st.cache_data
+  @st.cache_data
   def load_assessment_data(firestore_collection):
     data = list(db.collection(firestore_collection).stream())
     data_dict = list(map(lambda x: x.to_dict(), data))
     data_df = pd.DataFrame(data_dict)
     return data_df
-  papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
 
   def export_data(firestore_collection):
     data = list(db.collection(firestore_collection).stream())
@@ -470,7 +469,8 @@ else:
     st.write(data_df)
   ## tab 5 (NLP on assessments)###############################################
   with tab5:
-    revmaster_cols_nlp = [x for x in papers_df.columns.tolist()]
+    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+    revmaster_cols_nlp = [x for x in papers_assessed_df.columns.tolist() if 'revmaster' in x]
     st.write(revmaster_cols_nlp)
     st.write(papers_assessed_df)
 
