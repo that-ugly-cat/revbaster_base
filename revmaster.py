@@ -470,6 +470,9 @@ else:
   ## tab 5 (analysis)###############################################
   with tab5:
     import spacy
+    from collections import Counter
+    import matplotlib.pyplot as plt
+    from wordcloud import WordCloud
     @st.cache_data
     def load_nlp_model(model):
       try:
@@ -485,11 +488,30 @@ else:
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     revmaster_cols_nlp = [x for x in papers_assessed_df.columns.tolist() if 'revmaster' in x]
     st.write(revmaster_cols_nlp)
-    doc = nlp('here in the above we have parsed the text that we have taken for sample by using the model that we have initialized i.e load_model.')
-    lemmatized_string = []
-    for token in doc:
-      lemmatized_string.append(token.lemma_)
-    st.write(lemmatized_string)
+    
+    def do_lemma_freq(text):
+      doc = nlp(text)
+      lemmatized_string = []
+      for token in doc:
+        if not token.is_stop:
+          lemmatized_string.append(token.lemma_)
+      data = Counter(lemmatized_string)
+      data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
+      data_df.columns = ['Keyword', 'count']
+      data_df = data_df.sort_values(by=['count'], ascending = False)
+      wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
+      fig, ax = plt.subplots(figsize = (12, 6))
+      ax.imshow(wordcloud, interpolation="bilinear")
+      plt.axis("off")
+      st.pyplot(fig)
+      st.bar_chart(data_df, x = 'Keyword', y = 'count')
+      st.write(data_df)
+  
+  for column in ["revmaster_Infodemic__Characterization", "revmaster_Ethical_Issues_in_Infodemic_management", "revmaster_Conclusions_and_recommendations", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Infodemic_management___Characterization", "revmaster_Aims_of_Infodemic_management"]:
+    st.subheader(column)
+    text = papers_assessed_df[column].values.tolist()
+    text = ' '.join(text)
+    do_lemma_freq(text)
     
 
 ## sidebar#######################
