@@ -464,6 +464,7 @@ else:
   with tab5:
     revmaster_cols_nlp = [x for x in papers_df.columns.tolist()]
     st.write(revmaster_cols_nlp)
+    st.write(load_data(initial_config.firestore_collection))
 
 ## sidebar#######################
   ###sidebar 
