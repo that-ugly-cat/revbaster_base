@@ -1,5 +1,5 @@
 # RevMaster documentation
-
+# (still under heavy development, to be considered an alpha version)
 ## Installation
 - Fork this git repo
 - Add to this repo your firestore key json file (not a best practice, to be changed soon, use an expendable firebase account)
