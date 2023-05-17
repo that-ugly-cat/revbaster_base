@@ -513,7 +513,8 @@ else:
     text = [x for x in text if str(x) != 'nan']
     text = [x for x in text if str(x) != '...']
     text = ' '.join(text)
-    do_lemma_freq(text)
+    st.write(text)
+    #do_lemma_freq(text)
     
 
 ## sidebar#######################
