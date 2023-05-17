@@ -511,8 +511,9 @@ else:
     st.subheader(column)
     text = papers_assessed_df[column].values.tolist()
     text = [x for x in text if str(x) != 'nan']
-    st.write(text)
-    #do_lemma_freq(text)
+    text = [x for x in text if str(x) != '...']
+    text = ' '.join(text)
+    do_lemma_freq(text)
     
 
 ## sidebar#######################
