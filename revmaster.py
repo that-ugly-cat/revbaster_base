@@ -507,14 +507,14 @@ else:
       st.bar_chart(data_df, x = 'Keyword', y = 'count')
       st.write(data_df)
   
-  for column in ["revmaster_Infodemic__Characterization", "revmaster_Ethical_Issues_in_Infodemic_management", "revmaster_Conclusions_and_recommendations", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Infodemic_management___Characterization", "revmaster_Aims_of_Infodemic_management"]:
-    st.subheader(column)
-    text = papers_assessed_df[column].values.tolist()
-    text = [x for x in text if str(x) != 'nan']
-    text = [x for x in text if str(x) != '...']
-    text = ' '.join(text)
-    st.write(text)
-    #do_lemma_freq(text)
+    for column in ["revmaster_Infodemic__Characterization", "revmaster_Ethical_Issues_in_Infodemic_management", "revmaster_Conclusions_and_recommendations", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Infodemic_management___Characterization", "revmaster_Aims_of_Infodemic_management"]:
+      st.subheader(column)
+      text = papers_assessed_df[column].values.tolist()
+      text = [x for x in text if str(x) != 'nan']
+      text = [x for x in text if str(x) != '...']
+      text = ' '.join(text)
+      st.write(text)
+      #do_lemma_freq(text)
     
 
 ## sidebar#######################
