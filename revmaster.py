@@ -487,12 +487,12 @@ else:
     
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     revmaster_cols_nlp = initial_config.criteria
-    servicelist = []
+    servicedict = {}
     for x in revmaster_cols_nlp:
       y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
-      servicelist.append(y)
-    revmaster_cols_nlp = servicelist
-    st.write(revmaster_cols_nlp)
+      servicedict[x] = y
+    #revmaster_cols_nlp = servicelist
+    st.write(servicedict)
     
     def do_lemma_freq(text):
       doc = nlp(text)
