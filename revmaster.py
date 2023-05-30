@@ -498,6 +498,11 @@ else:
       data_df.reset_index(inplace=True)
       data_df.index = data_df.index + 1
       data_df.drop('index', axis='columns', inplace=True)
+      return(data_df)
+    def do_lemma_wordcloud(df):
+      data = {}
+      for index, row in df.iterrows:
+        data[row['Keyword']] = row[count]
       '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
@@ -505,7 +510,8 @@ else:
       st.pyplot(fig)
       st.bar_chart(data_df, x = 'Keyword', y = 'count')
       st.write(data_df)'''
-      return(data_df)    
+      return(data)
+      
     
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     revmaster_cols_nlp = initial_config.criteria
@@ -522,6 +528,8 @@ else:
       st.write(text)
       x = do_lemma_freq(text)
       st.write(x)
+      y = do_lemma_wordcloud(x)
+      st.write(y)
 
 ## sidebar#######################
   ###sidebar 
