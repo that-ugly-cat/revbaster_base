@@ -559,6 +559,7 @@ else:
     st.divider()
     
     country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist())))
+    country_list = sum(country_list, [])
     st.write(country_list)
         
 
