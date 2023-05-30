@@ -467,7 +467,7 @@ else:
     st.pyplot(fig)
     st.bar_chart(data_df, x = 'Keyword', y = 'count')
     st.write(data_df)
-  ## tab 5 (analysis)###############################################
+  ## tab 5 (NLP analysis)###############################################
   with tab5:
     import spacy
     from collections import Counter
@@ -513,6 +513,9 @@ else:
       
     
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+    st.write(len(papers_assessed_df))
+    papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
+    st.write(len(papers_assessed_df_included))
     revmaster_cols_nlp = initial_config.criteria
     nlp_columns_dict = {}
     for x in revmaster_cols_nlp:
