@@ -509,7 +509,6 @@ else:
       ax.imshow(wordcloud, interpolation="bilinear")
       plt.axis("off")
       st.pyplot(fig)
-      st.bar_chart(data_df, x = 'Keyword', y = 'count')
       return(data)
       
     
@@ -525,10 +524,12 @@ else:
       text = [x for x in text if str(x) != 'nan']
       text = [x for x in text if str(x) != '...']
       text = ' '.join(text)
-      st.write(text)
-      x = do_lemma_freq(text)
-      st.write(x)
-      y = do_lemma_wordcloud(x)
+      nlp_col1, nlp_col2 = st.columns([3, 1])
+      with nlp_col1:
+        x = do_lemma_freq(text)
+        st.write(x)
+      with nlp_col2:
+        y = do_lemma_wordcloud(x)
 
 ## sidebar#######################
   ###sidebar 
