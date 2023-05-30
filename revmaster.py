@@ -489,12 +489,14 @@ else:
       doc = nlp(text)
       lemmatized_string = []
       for token in doc:
-        if not token.is_stop:
+        if not token.is_stop and not token.is_punct:
           lemmatized_string.append(token.lemma_)
       data = Counter(lemmatized_string)
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
       data_df.columns = ['Keyword', 'count']
       data_df = data_df.sort_values(by=['count'], ascending = False)
+      data_df.reset_index(inplace=True)
+      data_df.index = data_df.index + 1
       '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
