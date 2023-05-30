@@ -544,6 +544,7 @@ else:
         y = do_lemma_wordcloud(x)
   ## tab 6 (NLP analysis)###############################################
   with tab6:
+    import itertools
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     n_papers_assessed = len(papers_assessed_df)
     papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
@@ -557,10 +558,7 @@ else:
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
     
-    country_list = []
-    for index, row in papers_assessed_df_included.iterrows():
-      country_list.append(row['revmaster_country'])
-        
+    country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist())))
     st.write(country_list)
         
 
