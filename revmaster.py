@@ -557,10 +557,8 @@ else:
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
     
-    for index, row in papers_assessed_df_included.iterrows():
-      st.write(row['revmaster_country'])
-      st.write(row['revmaster_methodology'])
-      st.write(row['revmaster_study_type'])
+    st.write(papers_assessed_df_included['revmaster_country'].describe())
+
 ## sidebar#######################
   ###sidebar 
   with st.sidebar:
