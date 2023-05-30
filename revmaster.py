@@ -511,7 +511,7 @@ else:
       y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
       nlp_columns_dict[x] = y
     st.write(nlp_columns_dict)
-    for key, item in nlp_columns_dict:
+    for key, item in nlp_columns_dict.items():
       st.subheader(key)
       text = papers_assessed_df[item].values.tolist()
       text = [x for x in text if str(x) != 'nan']
