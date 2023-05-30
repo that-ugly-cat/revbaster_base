@@ -504,13 +504,12 @@ else:
       data = {}
       for index, row in df.iterrows():
         data[row['Keyword']] = row['count']
-      '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
+      wordcloud = WordCloud(background_color="white", width=1600, height=800,  max_words=75).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
       plt.axis("off")
       st.pyplot(fig)
       st.bar_chart(data_df, x = 'Keyword', y = 'count')
-      st.write(data_df)'''
       return(data)
       
     
@@ -530,7 +529,6 @@ else:
       x = do_lemma_freq(text)
       st.write(x)
       y = do_lemma_wordcloud(x)
-      st.write(y)
 
 ## sidebar#######################
   ###sidebar 
