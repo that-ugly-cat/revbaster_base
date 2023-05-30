@@ -485,15 +485,6 @@ else:
       return nlp
     nlp = load_nlp_model('en_core_web_sm')
     
-    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
-    revmaster_cols_nlp = initial_config.criteria
-    servicedict = {}
-    for x in revmaster_cols_nlp:
-      y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
-      servicedict[x] = y
-    #revmaster_cols_nlp = servicelist
-    st.write(servicedict)
-    
     def do_lemma_freq(text):
       doc = nlp(text)
       lemmatized_string = []
@@ -504,23 +495,30 @@ else:
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
       data_df.columns = ['Keyword', 'count']
       data_df = data_df.sort_values(by=['count'], ascending = False)
-      wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
+      '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
       plt.axis("off")
       st.pyplot(fig)
       st.bar_chart(data_df, x = 'Keyword', y = 'count')
-      st.write(data_df)
-  
-    for column in ["revmaster_Infodemic__Characterization", "revmaster_Ethical_Issues_in_Infodemic_management", "revmaster_Conclusions_and_recommendations", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Ethical_Issues_in_Infodemics", "revmaster_Infodemic_management___Characterization", "revmaster_Aims_of_Infodemic_management"]:
-      st.subheader(column)
-      text = papers_assessed_df[column].values.tolist()
+      st.write(data_df)'''
+      return(data_df)    
+    
+    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+    revmaster_cols_nlp = initial_config.criteria
+    nlp_columns_dict = {}
+    for x in revmaster_cols_nlp:
+      y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
+      nlp_columns_dict[x] = y
+    st.write(nlp_columns_dict)
+    for key, item in nlp_columns_dict:
+      st.subheader(key)
+      text = papers_assessed_df[item].values.tolist()
       text = [x for x in text if str(x) != 'nan']
       text = [x for x in text if str(x) != '...']
       text = ' '.join(text)
       st.write(text)
-      #do_lemma_freq(text)
-    
+      do_lemma_freq(text)    
 
 ## sidebar#######################
   ###sidebar 
