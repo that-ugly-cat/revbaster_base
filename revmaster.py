@@ -558,11 +558,13 @@ else:
     st.text('Assessed as Maybe: ' + str(n_papers_maybe))
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
-    
+    ###Country
+    st.subheader('Country')
     country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist()))
     country_count = Counter(country_list)
     sorted_country_count = dict(sorted(country_count.items(), key=lambda x:x[1], reverse = True))
-    st.write(sorted_country_count)
+    st.bar_chart(sorted_country_count)
+    
         
 
 ## sidebar#######################
