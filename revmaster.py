@@ -520,9 +520,9 @@ else:
     n_papers_excluded = len(papers_assessed_df_excluded)
     papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
     n_papers_maybe = len(papers_assessed_df_maybe)
-    st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + '.')
-    st.text('Assessed as Maybe:' + str(n_papers_maybe))
-    st.text('Assessed as Exclude:' + str(n_papers_exclude))
+    st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+    st.text('Assessed as Maybe: ' + str(n_papers_maybe))
+    st.text('Assessed as Exclude: ' + str(n_papers_excluded))
     
     revmaster_cols_nlp = initial_config.criteria
     nlp_columns_dict = {}
