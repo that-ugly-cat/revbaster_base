@@ -202,7 +202,7 @@ else:
     return ag
   ####################################
   # Tabs
-  tab1, tab2, tab3, tab4, tab5 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis'])
+  tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis (assessments)', 'Analysis (document details)'])
   ## tab 1 (assessment)###############################################
   with tab1:
     # Main area (paper table)
@@ -467,7 +467,7 @@ else:
     st.pyplot(fig)
     st.bar_chart(data_df, x = 'Keyword', y = 'count')
     st.write(data_df)
-  ## tab 5 (NLP analysis)###############################################
+  ## tab 5 (NLP analysis of assessments)###############################################
   with tab5:
     import spacy
     from collections import Counter
@@ -541,7 +541,19 @@ else:
         st.write(x)
       with nlp_col2:
         y = do_lemma_wordcloud(x)
-
+  ## tab 6 (NLP analysis)###############################################
+  with tab6:
+    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+    n_papers_assessed = len(papers_assessed_df)
+    papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
+    n_papers_included = len(papers_assessed_df_included)
+    papers_assessed_df_excluded = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No']
+    n_papers_excluded = len(papers_assessed_df_excluded)
+    papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
+    n_papers_maybe = len(papers_assessed_df_maybe)
+    st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+    st.text('Assessed as Maybe: ' + str(n_papers_maybe))
+    st.text('Assessed as Exclude: ' + str(n_papers_excluded))
 ## sidebar#######################
   ###sidebar 
   with st.sidebar:
