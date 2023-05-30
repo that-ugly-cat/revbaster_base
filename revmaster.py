@@ -489,7 +489,7 @@ else:
       doc = nlp(text)
       lemmatized_string = []
       for token in doc:
-        if not token.is_stop and not token.is_punct:
+        if not token.is_stop and not token.is_punct and not token == ' ':
           lemmatized_string.append(token.lemma_)
       data = Counter(lemmatized_string)
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
@@ -497,6 +497,7 @@ else:
       data_df = data_df.sort_values(by=['count'], ascending = False)
       data_df.reset_index(inplace=True)
       data_df.index = data_df.index + 1
+      data_df.drop('index', axis='columns', inplace=True)
       '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
@@ -512,7 +513,6 @@ else:
     for x in revmaster_cols_nlp:
       y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
       nlp_columns_dict[x] = y
-    st.write(nlp_columns_dict)
     for key, item in nlp_columns_dict.items():
       st.subheader(key)
       text = papers_assessed_df[item].values.tolist()
