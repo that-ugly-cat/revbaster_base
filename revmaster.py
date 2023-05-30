@@ -561,6 +561,7 @@ else:
     
     country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist()))
     country_count = Counter(country_list)
+    sorted_country_count = sorted(country_count.items(), key=lambda x:x[1])
     st.write(country_count)
         
 
