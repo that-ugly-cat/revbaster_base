@@ -523,6 +523,7 @@ else:
     st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
     st.text('Assessed as Maybe: ' + str(n_papers_maybe))
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
+    st.divider()
     
     revmaster_cols_nlp = initial_config.criteria
     nlp_columns_dict = {}
@@ -531,7 +532,7 @@ else:
       nlp_columns_dict[x] = y
     for key, item in nlp_columns_dict.items():
       st.subheader(key)
-      text = papers_assessed_df[item].values.tolist()
+      text = papers_assessed_df_included[item].values.tolist()
       text = [x for x in text if str(x) != 'nan']
       text = [x for x in text if str(x) != '...']
       text = ' '.join(text)
@@ -554,6 +555,12 @@ else:
     st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
     st.text('Assessed as Maybe: ' + str(n_papers_maybe))
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
+    st.divider()
+    
+    for index, row in papers_assessed_df_included.iterrows():
+      st.write(row['revmaster_country'])
+      st.write(row['revmaster_methodology'])
+      st.write(row['revmaster_study_type'])
 ## sidebar#######################
   ###sidebar 
   with st.sidebar:
