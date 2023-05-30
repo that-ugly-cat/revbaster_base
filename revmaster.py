@@ -559,8 +559,7 @@ else:
     
     country_list = []
     for index, row in papers_assessed_df_included.iterrows():
-      for x in row['revmaster_country']:
-        country_list.append(x)
+      country_list.append(row['revmaster_country'])
         
     st.write(country_list)
         
