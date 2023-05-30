@@ -524,7 +524,7 @@ else:
       text = [x for x in text if str(x) != 'nan']
       text = [x for x in text if str(x) != '...']
       text = ' '.join(text)
-      nlp_col1, nlp_col2 = st.columns([3, 1])
+      nlp_col1, nlp_col2 = st.columns([1, 3])
       with nlp_col1:
         x = do_lemma_freq(text)
         st.write(x)
