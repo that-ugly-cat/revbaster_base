@@ -499,9 +499,10 @@ else:
       data_df.index = data_df.index + 1
       data_df.drop('index', axis='columns', inplace=True)
       return(data_df)
+    
     def do_lemma_wordcloud(df):
       data = {}
-      for index, row in df.iterrows:
+      for index, row in df.iterrows():
         data[row['Keyword']] = row[count]
       '''wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
