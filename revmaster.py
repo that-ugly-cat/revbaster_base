@@ -489,7 +489,7 @@ else:
       doc = nlp(text)
       lemmatized_string = []
       for token in doc:
-        if not token.is_stop and not token.is_punct:
+        if not token.is_stop and not token.is_punct and not token.is_space and not token.is_digit:
           lemmatized_string.append(token.lemma_)
       data = Counter(lemmatized_string)
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
