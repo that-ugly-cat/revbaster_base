@@ -518,7 +518,8 @@ else:
       text = [x for x in text if str(x) != '...']
       text = ' '.join(text)
       st.write(text)
-      do_lemma_freq(text)    
+      x = do_lemma_freq(text)
+      st.write(x)
 
 ## sidebar#######################
   ###sidebar 
