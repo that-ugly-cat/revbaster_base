@@ -557,7 +557,7 @@ else:
     st.text('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
     
-    st.write(papers_assessed_df_included['revmaster_country'].values())
+    st.write(papers_assessed_df_included['revmaster_country'].value_counts())
 
 ## sidebar#######################
   ###sidebar 
