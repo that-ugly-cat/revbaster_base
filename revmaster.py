@@ -564,11 +564,24 @@ else:
     country_count = Counter(country_list)
     sorted_country_count = dict(sorted(country_count.items(), key=lambda x:x[1], reverse = True))
     st.bar_chart(sorted_country_count)
+    ###Year
+    st.subheader('Study year')
+    study_year_list = papers_assessed_df_included.revmaster_study_year.values.tolist()
+    study_year_count = Counter(study_year_list)
+    sorted_study_year_count = dict(sorted(study_year_count.items(), key=lambda x:x[1], reverse = True))
+    st.bar_chart(sorted_study_year_count)
     ###Study type
+    st.subheader('Study Type')
     study_type_list = papers_assessed_df_included.revmaster_study_type.values.tolist()
     study_type_count = Counter(study_type_list)
     sorted_study_type_count = dict(sorted(study_type_count.items(), key=lambda x:x[1], reverse = True))
     st.bar_chart(sorted_study_type_count)
+    ###Methodology
+    st.subheader('Methodology')
+    methodology_list = list(itertools.chain(*papers_assessed_df_included.revmaster_methodology.values.tolist()))
+    methodology_count = Counter(methodology_list)
+    sorted_methodology_count = dict(sorted(methodology_count.items(), key=lambda x:x[1], reverse = True))
+    st.bar_chart(sorted_methodology_count)
         
 
 ## sidebar#######################
