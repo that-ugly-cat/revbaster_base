@@ -545,6 +545,7 @@ else:
   ## tab 6 (NLP analysis)###############################################
   with tab6:
     import itertools
+    from collections import Counter
     papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
     n_papers_assessed = len(papers_assessed_df)
     papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
@@ -559,8 +560,8 @@ else:
     st.divider()
     
     country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist()))
-    #country_list = sum(country_list, [])
-    st.write(country_list)
+    country_count = Counter(country_list)
+    st.write(country_count)
         
 
 ## sidebar#######################
