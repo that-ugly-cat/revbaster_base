@@ -12,3 +12,4 @@ matplotlib
 XlsxWriter
 pyxlsb
 spacy
+itertools
