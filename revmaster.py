@@ -425,8 +425,11 @@ else:
                 savedict[criterion_dict_index] = st.session_state[criterion_widget_name]
             doc_ref.update(savedict)
             st.success('Saved!')
+    ## tab 2 (Analysis)###############################################        
     with tab2:
-      st.write('Enable the analysis features to see the analysis. \nAnalysis is disabled by default to save memory and allow a faster use of the interface during the assessment. \nIt can be enabled using the checkbox in the sidebar.')
+      st.write('Enable the analysis features to see the analysis. \n\nAnalysis is disabled by default to save memory and allow a faster use of the interface during the assessment. \n\nIt can be enabled using the checkbox in the sidebar.')
+      papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+      st.write(papers_assessed_df)
 ############
   if enable_analysis_widgets == True:
     # Tabs
