@@ -433,7 +433,8 @@ else:
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes'])) + ' / ' + str(len(papers_assessed_df)) + ' included.')
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No'])) + ' / ' + str(len(papers_assessed_df)) + ' excluded.')
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe'])) + ' / ' + str(len(papers_assessed_df)) + ' assessed as \'maybe\', -> to be double-checked.')
-      st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] not in ['Yes', 'No', 'Maybe']]])) + ' / ' + str(len(papers_assessed_df)) + ' NOT assessed yet -> to be assessed.')
+      
+      st.write(str(len(papers_assessed_df.loc[(papers_assessed_df['revmaster_include'] != 'Yes') & (papers_assessed_df['revmaster_include'] != 'No') & (papers_assessed_df['revmaster_include'] != 'maybe')])) + ' / ' + str(len(papers_assessed_df)) + ' NOT assessed yet -> to be assessed.')
       st.subheader('Documents to double-check')
       data = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
       data = data[['Key', 'Author', 'Publication Year', 'Title']]
