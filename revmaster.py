@@ -429,8 +429,10 @@ else:
     with tab2:
       st.write('Enable the analysis features to see the analysis. \n\nAnalysis is disabled by default to save memory and allow a faster use of the interface during the assessment. \n\nIt can be enabled using the checkbox in the sidebar.')
       papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
-      st.subheader('Documents addessed')
+      st.subheader('Documents assessed')
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes'])) + ' / ' + str(len(papers_assessed_df)) + ' included.')
+      st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No'])) + ' / ' + str(len(papers_assessed_df)) + ' excluded.')
+      st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe'])) + ' / ' + str(len(papers_assessed_df)) + ' assessed as \'maybe\', -> to be double-checked.')
       st.write(papers_assessed_df)
 ############
   if enable_analysis_widgets == True:
