@@ -509,6 +509,7 @@ else:
       ax.imshow(wordcloud, interpolation="bilinear")
       plt.axis("off")
       st.pyplot(fig)
+      plt.close(fig)
       return(data)
       
     
