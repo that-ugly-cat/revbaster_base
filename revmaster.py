@@ -492,10 +492,7 @@ else:
       lemmatized_string = []
       for token in doc:
         if not token.is_stop and not token.is_punct and not token.is_space and not token.is_digit:
-          if token.lower() == 'media' or token.lower() == 'data':
-            lemmatized_string.append(token.lower())
-          else:
-            lemmatized_string.append(token.lemma_)
+          lemmatized_string.append(token.lemma_)
       data = Counter(lemmatized_string)
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
       data_df.columns = ['Keyword', 'count']
