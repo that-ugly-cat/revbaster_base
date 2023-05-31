@@ -217,7 +217,7 @@ else:
   ####################################
   if enable_analysis_widgets == False:
     # Tabs
-    tab1 = st.tabs(['Assessment'])
+    tab1, tab2 = st.tabs(['Assessment', 'Info'])
     ## tab 1 (assessment)###############################################
     with tab1:
       # Main area (paper table)
@@ -425,6 +425,8 @@ else:
                 savedict[criterion_dict_index] = st.session_state[criterion_widget_name]
             doc_ref.update(savedict)
             st.success('Saved!')
+    with tab2:
+      st.write('Enable the analysis features to see the analysis. \nAnalysis is disabled by default to save memory and allow a faster use of the interface during the assessment. \nIt can be enabled using the checkbox in the sidebar.')
 ############
   if enable_analysis_widgets == True:
     # Tabs
