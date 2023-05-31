@@ -607,6 +607,7 @@ else:
         if analysis_widget == False:
           st.info('Analysis features disabled')
           st.session_state['enable_analysis'] = 'no'
+    st.write(st.session_state['enable_analysis'])
     ## login##
     if 'auth_status' not in st.session_state:
       st.session_state['auth_status'] = 'ro'
