@@ -120,11 +120,11 @@ else:
   else:
     enable_analysis = st.session_state.enable_analysis
     if enable_analysis == 'no':
-        enable_analysis_widgets = False
-        st.info('Analysis not enabled')
-      if enable_analysis == 'yes':
-        enable_analysis_widgets = True
-        st.info('Analysis enabled')
+      enable_analysis_widgets = False
+      st.info('Analysis not enabled')
+    if enable_analysis == 'yes':
+      enable_analysis_widgets = True
+      st.info('Analysis enabled')
   ###
 
   # load country options
