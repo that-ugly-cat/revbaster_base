@@ -592,6 +592,18 @@ else:
 ## sidebar#######################
   ###sidebar 
   with st.sidebar:
+    ## enable analysis functions ##
+    if 'enable_analysis' not in st.session_state:
+      st.session_state['enable_analysis'] = 'no'
+    if 'enable_analysis' in st.session_state:
+      if st.session_state['enable_analysis'] == 'no':
+        analysis_widget = st.checkbox('Enable analysis', value = False)
+        if analysis_widget:
+          st.message('Enabling analysis features')
+      if st.session_state['enable_analysis'] == 'yes':
+        analysis_widget = st.checkbox('Enable analysis', value = True)
+        if not analysis_widget:
+          st.message('Disabling analysis features')
     ## login##
     if 'auth_status' not in st.session_state:
       st.session_state['auth_status'] = 'ro'
@@ -621,7 +633,9 @@ else:
         if st.button('Logout'):
           st.session_state['auth_status'] = 'ro'
           st.experimental_rerun()
-        ## export button##
+
+            
+        ## export button ##
         import xlsxwriter
         from pyxlsb import open_workbook as open_xlsb
         st.subheader('Export assessment data')
