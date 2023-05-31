@@ -121,10 +121,10 @@ else:
     enable_analysis = st.session_state.enable_analysis
     if enable_analysis == 'no':
       enable_analysis_widgets = False
-      st.info('Analysis not enabled')
+      st.error('⛔ Analysis not enabled')
     if enable_analysis == 'yes':
       enable_analysis_widgets = True
-      st.info('Analysis enabled')
+      st.success('👌 Analysis enabled')
   ###
 
   # load country options
@@ -217,7 +217,7 @@ else:
   ####################################
   if enable_analysis_widgets == False:
     # Tabs
-    tab1, tab2 = st.tabs(['Assessment', 'Info'])
+    tab1, tab2 = st.tabs(['Assessment', 'Analysis'])
     ## tab 1 (assessment)###############################################
     with tab1:
       # Main area (paper table)
@@ -828,14 +828,13 @@ else:
       if st.session_state['enable_analysis'] == 'no':
         analysis_widget = st.checkbox('Enable analysis', value = False)
         if analysis_widget == True:
-          st.info('Analysis features enabled')
+          st.info('👌 Analysis features enabled')
           st.session_state['enable_analysis'] = 'yes'
       if st.session_state['enable_analysis'] == 'yes':
         analysis_widget = st.checkbox('Enable analysis', value = True)
         if analysis_widget == False:
-          st.info('Analysis features disabled')
+          st.info('⛔ Analysis features disabled')
           st.session_state['enable_analysis'] = 'no'
-    st.write(st.session_state['enable_analysis'])
     ## login##
     if 'auth_status' not in st.session_state:
       st.session_state['auth_status'] = 'ro'
