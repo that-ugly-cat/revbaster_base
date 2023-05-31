@@ -578,7 +578,10 @@ else:
     st.bar_chart(sorted_study_type_count)
     ###Methodology
     st.subheader('Methodology')
-        
+    methodology_list = papers_assessed_df_included.revmaster_methodology.values.tolist()
+    methodology_count = Counter(methodology_list)
+    sorted_methodology_count = dict(sorted(methodology_count.items(), key=lambda x:x[1], reverse = True))
+    st.bar_chart(sorted_methodology_count) 
 
 ## sidebar#######################
   ###sidebar 
