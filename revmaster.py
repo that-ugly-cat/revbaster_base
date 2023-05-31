@@ -587,7 +587,8 @@ else:
     st.subheader('Methodology (of other studies)')
     data = papers_assessed_df_included[papers_assessed_df_included['revmaster_study_type'] != 'Empirical']
     methodology_o_list = data.revmaster_methodology.values.tolist()
-    #methodology_o_count = Counter(methodology_o_list)
+    methodology_o_list = [x for x in methodology_o_list if x != '']
+    methodology_o_count = Counter(methodology_o_list)
     #sorted_methodology_o_count = dict(sorted(methodology_o_count.items(), key=lambda x:x[1], reverse = True))
     #st.bar_chart(sorted_methodology_o_count)
     st.write(methodology_o_list)
