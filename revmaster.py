@@ -444,8 +444,8 @@ else:
     st.write(data_df)
   ## tab 4 (manual tags)###############################################
   with tab4:
-    st.text('Manual tags include keywords and MeSH terms aggregated in one single column.')
-    st.text('A stoplist is hard-coded in the software, it contains the word \'article\' and it can be customized in the code.')
+    st.write('Manual tags include keywords and MeSH terms aggregated in one single column.')
+    st.write('A stoplist is hard-coded in the software, it contains the word \'article\' and it can be customized in the code.')
     from collections import Counter
     import matplotlib.pyplot as plt
     from wordcloud import WordCloud
@@ -523,9 +523,9 @@ else:
     n_papers_excluded = len(papers_assessed_df_excluded)
     papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
     n_papers_maybe = len(papers_assessed_df_maybe)
-    st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
-    st.text('Assessed as Maybe: ' + str(n_papers_maybe))
-    st.text('Assessed as Exclude: ' + str(n_papers_excluded))
+    st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+    st.write('Assessed as Maybe: ' + str(n_papers_maybe))
+    st.write('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
     
     revmaster_cols_nlp = initial_config.criteria
@@ -557,9 +557,9 @@ else:
     n_papers_excluded = len(papers_assessed_df_excluded)
     papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
     n_papers_maybe = len(papers_assessed_df_maybe)
-    st.text('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
-    st.text('Assessed as Maybe: ' + str(n_papers_maybe))
-    st.text('Assessed as Exclude: ' + str(n_papers_excluded))
+    st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+    st.write('Assessed as Maybe: ' + str(n_papers_maybe))
+    st.write('Assessed as Exclude: ' + str(n_papers_excluded))
     st.divider()
     ###Country
     st.subheader('Country')
