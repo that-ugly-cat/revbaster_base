@@ -215,7 +215,7 @@ else:
                 gridOptions=gb.build())
     return ag
   ####################################
-  if enable_analysis_widgets = False:
+  if enable_analysis_widgets == False:
     # Tabs
     tab1 = st.tabs(['Assessment'])
     ## tab 1 (assessment)###############################################
@@ -426,7 +426,7 @@ else:
             doc_ref.update(savedict)
             st.success('Saved!')
 ############
-  if enable_analysis_widgets = True:
+  if enable_analysis_widgets == True:
     # Tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis (assessments)', 'Analysis (document details)'])
     ## tab 1 (assessment)###############################################
