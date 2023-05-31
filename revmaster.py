@@ -433,11 +433,11 @@ else:
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes'])) + ' / ' + str(len(papers_assessed_df)) + ' included.')
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No'])) + ' / ' + str(len(papers_assessed_df)) + ' excluded.')
       st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe'])) + ' / ' + str(len(papers_assessed_df)) + ' assessed as \'maybe\', -> to be double-checked.')
+      st.write(str(len(papers_assessed_df[papers_assessed_df['revmaster_include'] == ''])) + ' / ' + str(len(papers_assessed_df)) + ' NOT assessed yet -> to be assessed.')
       st.subheader('Documents to double-check')
       data = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
       data = data[['Key', 'Author', 'Publication Year', 'Title']]
       st.write(data)
-      st.write(papers_assessed_df)
 ############
   if enable_analysis_widgets == True:
     # Tabs
