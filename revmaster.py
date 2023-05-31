@@ -439,6 +439,7 @@ else:
     ax.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     st.pyplot(fig)
+    plt.close(fig)
     st.bar_chart(data_df, x = 'Author', y = 'count')
     st.write(data_df)
   ## tab 4 (manual tags)###############################################
@@ -465,6 +466,7 @@ else:
     ax.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     st.pyplot(fig)
+    plt.close(fig)
     st.bar_chart(data_df, x = 'Keyword', y = 'count')
     st.write(data_df)
   ## tab 5 (NLP analysis of assessments)###############################################
