@@ -576,9 +576,10 @@ else:
     study_type_count = Counter(study_type_list)
     sorted_study_type_count = dict(sorted(study_type_count.items(), key=lambda x:x[1], reverse = True))
     st.bar_chart(sorted_study_type_count)
-    ###Methodology
-    st.subheader('Methodology')
-    methodology_list = papers_assessed_df_included.revmaster_methodology.values.tolist()
+    ###Methodology (of empirical studies)
+    st.subheader('Methodology (of empirical studies)')
+    data = papers_assessed_df_included[papers_assessed_df_included['revmaster_study_type'] == 'Empirical']
+    methodology_list = list(itertools.chain(*data.revmaster_methodology.values.tolist()))
     methodology_count = Counter(methodology_list)
     sorted_methodology_count = dict(sorted(methodology_count.items(), key=lambda x:x[1], reverse = True))
     st.bar_chart(sorted_methodology_count) 
