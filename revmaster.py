@@ -112,6 +112,20 @@ else:
       if auth_status == 'ro':
         auth_widgets = True
   ###
+  #####analysis enabled#####
+  if 'enable_analysis' not in st.session_state:
+    enable_analysis = 'no'
+    enable_analysis_widgets = False
+    st.info('Analysis not enabled')
+  else:
+    enable_analysis = st.session_state.enable_analysis
+    if enable_analysis == 'no':
+        enable_analysis_widgets = False
+        st.info('Analysis not enabled')
+      if enable_analysis == 'yes':
+        enable_analysis_widgets = True
+        st.info('Analysis enabled')
+  ###
 
   # load country options
   try:
@@ -201,392 +215,604 @@ else:
                 gridOptions=gb.build())
     return ag
   ####################################
-  # Tabs
-  tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis (assessments)', 'Analysis (document details)'])
-  ## tab 1 (assessment)###############################################
-  with tab1:
-    # Main area (paper table)
-    ####################################
-    # see: https://discuss.streamlit.io/t/ag-grid-component-with-input-support/8108/242
-    paper = display_table(papers_df)
-    st.divider()
-    try: 
-      paper_key = (paper['selected_rows'][0]['Key'])
-      idx = papers_df[papers_df['Key']== paper_key].index.item()
-      doc_ref = db.collection(initial_config.firestore_collection).document(paper_key)
-      doc = doc_ref.get()
-      doc_asdict = doc.to_dict()
-    except: 
-      paper_key = papers_df.iloc[0]['Key']
-      idx = papers_df[papers_df['Key']== paper_key].index.item()
+  if enable_analysis_widgets = False:
+    # Tabs
+    tab1 = st.tabs(['Assessment'])
+    ## tab 1 (assessment)###############################################
+    with tab1:
+      # Main area (paper table)
+      ####################################
+      # see: https://discuss.streamlit.io/t/ag-grid-component-with-input-support/8108/242
+      paper = display_table(papers_df)
+      st.divider()
+      try: 
+        paper_key = (paper['selected_rows'][0]['Key'])
+        idx = papers_df[papers_df['Key']== paper_key].index.item()
+        doc_ref = db.collection(initial_config.firestore_collection).document(paper_key)
+        doc = doc_ref.get()
+        doc_asdict = doc.to_dict()
+      except: 
+        paper_key = papers_df.iloc[0]['Key']
+        idx = papers_df[papers_df['Key']== paper_key].index.item()
 
-    try:
-      # build file name
-      ## Author
-      authors = papers_df[papers_df['Key'] == paper_key]['Author'].values[0]
-
-      ## Title
-      title = papers_df[papers_df['Key'] == paper_key]['Title'].values[0]
-      show_title = st.subheader(title)
-
-      ## Year
-      year = papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0]
-      year = int(year)
-
-    except:
-      st.text('Select a paper to start the assessment')
-
-    names_for_file = []
-    authorlist = authors.split(';')
-    for x in authorlist:
-      surname = x.split(',')
-      names_for_file.append(surname[0].strip())
-    # Finding pdfs
-    ####################################
-    ## here I apply a rule to determine how many author surnames are used in the filename.
-    names_for_file_parsed = []
-    if len(names_for_file) == 1:
-      names_for_file_parsed.append(names_for_file[0])
-    if len(names_for_file) == 2:
-      names_for_file_parsed.append(names_for_file[0])
-      names_for_file_parsed.append(', ')
-      names_for_file_parsed.append(names_for_file[1])
-    if len(names_for_file) > 2:
-      names_for_file_parsed.append(names_for_file[0])
-      names_for_file_parsed.append(', ')
-      names_for_file_parsed.append(names_for_file[1])
-      names_for_file_parsed.append(' et al')
-    names_for_file_string = ''.join(names_for_file_parsed)
-    auth_and_year = names_for_file_string + ', ' + str(year)
-    st.text(auth_and_year)
-
-    probable_files = []
-    for file in os.listdir('pdfs'):
-      if file.find(names_for_file_string)!= -1:
-          probable_files.append(file)
-
-    # here we specify which file to serve
-    if len(probable_files) == 0:
-      pdf_file = 'dang!'
-    if len(probable_files) == 1:
-      pdf_file = 'pdfs/' + probable_files[0]
-    if len(probable_files) > 1:
-      probable_files_title = []
-      title_as_list = title.split(' ')
-      first_words = title_as_list[0:2]
-      first_words= ' '.join(first_words)
-      for file in probable_files:
-        if file.find(first_words)!= -1:
-          probable_files_title.append(file)
-        if len(probable_files_title) == 0:
-          pdf_file = 'dang!'
-        if len(probable_files_title) == 1:
-          pdf_file = 'pdfs/' + probable_files_title[0]
-        if len(probable_files_title) > 1:
-          pdf_file = 'doubledang!'
-      st.text(probable_files_title)
-    #####################################
-
-    # Display PDF and assessment fields
-    ####################################
-    st.divider()
-    with st.container():
-      col1, col2 = st.columns([3, 2])
-      with col1:
-        if pdf_file not in ['dang!', 'doubledang!']:
-          show_pdf(pdf_file)
-        else:
-          if pdf_file == 'dang!':
-            st.error('Dang! Could not find that pdf file. Apologies about that.')
-          if pdf_file == 'doubledang!':
-            st.error('Double dang! Found more than one file matching that author/title combination. Apologies about that.')
-      with col2:
-        st.subheader("Assessment")
-        ## Include?
-        try:
-          option_include = doc_asdict['revmaster_include']
-          option_include_index = include_options.index(option_include)
-          if option_include == 'Yes':
-            st.success('Paper already assessed as: include', icon = '👌')
-          if option_include == 'No':
-            st.error('Paper already assessed as: exclude', icon = '⛔')
-          if option_include == 'Maybe':
-            st.info('Paper already assessed as: maybe', icon = '❔')
-          with st.expander('See inclusion criteria'):
-            st.write(initial_config.inclusion_criteria)
-          include_widget = st.radio('Include?', include_options, index = option_include_index, horizontal = True, disabled = auth_widgets)
-        except:
-          st.warning('Paper not assessed yet', icon = '⚠️')
-          include_widget = st.radio('Include?', include_options, index = 0, horizontal = True, disabled = auth_widgets)
-          with st.expander('See inclusion criteria'):
-            st.write(initial_config.inclusion_criteria)
-        col1_sidebar, col2_sidebar = st.columns(2)
-        with col1_sidebar:
-          ## Country
-          try:
-            options_country = doc_asdict['revmaster_country']
-            country_widget = st.multiselect('Country', options = country_options, default = options_country, disabled = auth_widgets)
-          except:
-            country_widget = st.multiselect('Country', options = country_options, default = None, disabled = auth_widgets)
-        with col2_sidebar:
-        # Year
-          try:
-            study_year_value = doc_asdict['revmaster_year']            
-          except: 
-            try:
-              study_year_value = int(papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0])
-            except:
-              study_year_value = 0
-          study_year_widget = st.number_input('Year', format = '%d', step = 1, value = study_year_value, disabled = auth_widgets)
-        # Health emergency
-        try: 
-          health_emergency = doc_asdict['revmaster_health_emergency']
-          health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
-        except:
-          health_emergency = ''
-          health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
-
-        
-        # Study type
-        try: 
-          option_study_type = doc_asdict['revmaster_study_type']
-          option_study_type_index = study_type_options.index(option_study_type)
-          study_type_widget = st.radio('Study type', options = study_type_options, index = option_study_type_index, disabled = auth_widgets)
-        except:
-          option_study_type = study_type_options[0]
-          study_type_widget = st.radio('Study type', options = study_type_options, index = 0, disabled = auth_widgets)
-
-        # Methodology
-        if study_type_widget == 'Empirical':
-          with st.expander('See explanation of options'):
-            st.write(methodology_options_empirical_explanation)
-          try:
-            options_methodology = doc_asdict['revmaster_methodology']
-            methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = options_methodology, disabled = auth_widgets)
-          except: 
-            methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = None, disabled = auth_widgets)
-        if study_type_widget == 'Literature review':
-          with st.expander('See explanation of options'):
-              st.write(methodology_options_litrev_explanation)
-          try:
-            options_methodology = doc_asdict['revmaster_methodology']
-            methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = options_methodology, disabled = auth_widgets)
-          except:
-            methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = None, disabled = auth_widgets)
-        if study_type_widget in ['Theoretical', 'Viewpoint/commentary', 'Other']:
-          try:
-            options_methodology = doc_asdict['revmaster_methodology']
-            methodology_widget = st.text_input('Methodological notes', value = options_methodology, disabled = auth_widgets)
-          except:
-            methodology_widget = st.text_input('Methodological notes', value = '')
-
-        # Assessment criteria
-
-        for criterion in initial_config.criteria:
-          criterion_key = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
-          try:
-            criterion_text = doc_asdict[criterion_key]
-            criterion_widget_name = criterion + '_widget'
-            st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
-          except:
-            criterion_text = ''
-            criterion_widget_name = criterion + '_widget'
-            st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
-        save_assessment = st.button("Save", disabled = auth_widgets)
-
-        if save_assessment:
-          savedict = {'revmaster_include': include_widget, 
-                    'revmaster_country': country_widget, 
-                    'revmaster_study_year' : study_year_widget,
-                    'revmaster_study_type' : study_type_widget, 
-                    'revmaster_methodology' : methodology_widget,
-                    'revmaster_health_emergency' : health_emergency_widget}
-          for criterion in initial_config.criteria:
-            criterion_widget_name = criterion + '_widget'
-            criterion_dict_index = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
-            if st.session_state[criterion_widget_name] == '':
-              savedict[criterion_dict_index] = '...'
-            else:
-              savedict[criterion_dict_index] = st.session_state[criterion_widget_name]
-          doc_ref.update(savedict)
-          st.success('Saved!')
-
-  ## tab 2 (papers per year)###############################################
-  with tab2:
-    data = papers_df['Publication Year'].value_counts().rename_axis('Year').to_frame('counts')
-    data = data.sort_values('Year')
-    st.line_chart(data)
-    st.write(data)
-  ## tab 3 (authors)###############################################
-  with tab3:
-    from collections import Counter
-    import matplotlib.pyplot as plt
-    from wordcloud import WordCloud
-    authorlist = []
-    for author_block in papers_df['Author'].values.tolist():
       try:
-        authors = author_block.split(';')
-        for author in authors:
-          authorlist.append(author.strip())
+        # build file name
+        ## Author
+        authors = papers_df[papers_df['Key'] == paper_key]['Author'].values[0]
+
+        ## Title
+        title = papers_df[papers_df['Key'] == paper_key]['Title'].values[0]
+        show_title = st.subheader(title)
+
+        ## Year
+        year = papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0]
+        year = int(year)
+
       except:
-        authorlist.append(author_block)
-    data = Counter(authorlist)
-    data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
-    data_df.columns = ['Author', 'count']
-    data_df = data_df.sort_values(by=['count'], ascending = False)
-    wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
-    fig, ax = plt.subplots(figsize = (12, 6))
-    ax.imshow(wordcloud, interpolation="bilinear")
-    plt.axis("off")
-    st.pyplot(fig)
-    plt.close(fig)
-    st.bar_chart(data_df, x = 'Author', y = 'count')
-    st.write(data_df)
-  ## tab 4 (manual tags)###############################################
-  with tab4:
-    st.write('Manual tags include keywords and MeSH terms aggregated in one single column.')
-    st.write('A stoplist is hard-coded in the software, it contains the word \'article\' and it can be customized in the code.')
-    from collections import Counter
-    import matplotlib.pyplot as plt
-    from wordcloud import WordCloud
-    kwlist = []
-    for kw_block in papers_df['Manual Tags'].values.tolist():
-      if isinstance(kw_block, str):
-        kws = kw_block.split(';')
-        for kw in kws:
-          kw_processed = kw.strip().lower().replace('*', '')
-          if kw_processed not in ['article', 'other stopwords']: # this is the stoplist
-            kwlist.append(kw_processed)
-    data = Counter(kwlist)
-    data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
-    data_df.columns = ['Keyword', 'count']
-    data_df = data_df.sort_values(by=['count'], ascending = False)
-    wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
-    fig, ax = plt.subplots(figsize = (12, 6))
-    ax.imshow(wordcloud, interpolation="bilinear")
-    plt.axis("off")
-    st.pyplot(fig)
-    plt.close(fig)
-    st.bar_chart(data_df, x = 'Keyword', y = 'count')
-    st.write(data_df)
-  ## tab 5 (NLP analysis of assessments)###############################################
-  with tab5:
-    import spacy
-    from collections import Counter
-    import matplotlib.pyplot as plt
-    from wordcloud import WordCloud
-    @st.cache_data
-    def load_nlp_model(model):
+        st.text('Select a paper to start the assessment')
+
+      names_for_file = []
+      authorlist = authors.split(';')
+      for x in authorlist:
+        surname = x.split(',')
+        names_for_file.append(surname[0].strip())
+      # Finding pdfs
+      ####################################
+      ## here I apply a rule to determine how many author surnames are used in the filename.
+      names_for_file_parsed = []
+      if len(names_for_file) == 1:
+        names_for_file_parsed.append(names_for_file[0])
+      if len(names_for_file) == 2:
+        names_for_file_parsed.append(names_for_file[0])
+        names_for_file_parsed.append(', ')
+        names_for_file_parsed.append(names_for_file[1])
+      if len(names_for_file) > 2:
+        names_for_file_parsed.append(names_for_file[0])
+        names_for_file_parsed.append(', ')
+        names_for_file_parsed.append(names_for_file[1])
+        names_for_file_parsed.append(' et al')
+      names_for_file_string = ''.join(names_for_file_parsed)
+      auth_and_year = names_for_file_string + ', ' + str(year)
+      st.text(auth_and_year)
+
+      probable_files = []
+      for file in os.listdir('pdfs'):
+        if file.find(names_for_file_string)!= -1:
+            probable_files.append(file)
+
+      # here we specify which file to serve
+      if len(probable_files) == 0:
+        pdf_file = 'dang!'
+      if len(probable_files) == 1:
+        pdf_file = 'pdfs/' + probable_files[0]
+      if len(probable_files) > 1:
+        probable_files_title = []
+        title_as_list = title.split(' ')
+        first_words = title_as_list[0:2]
+        first_words= ' '.join(first_words)
+        for file in probable_files:
+          if file.find(first_words)!= -1:
+            probable_files_title.append(file)
+          if len(probable_files_title) == 0:
+            pdf_file = 'dang!'
+          if len(probable_files_title) == 1:
+            pdf_file = 'pdfs/' + probable_files_title[0]
+          if len(probable_files_title) > 1:
+            pdf_file = 'doubledang!'
+        st.text(probable_files_title)
+      #####################################
+
+      # Display PDF and assessment fields
+      ####################################
+      st.divider()
+      with st.container():
+        col1, col2 = st.columns([3, 2])
+        with col1:
+          if pdf_file not in ['dang!', 'doubledang!']:
+            show_pdf(pdf_file)
+          else:
+            if pdf_file == 'dang!':
+              st.error('Dang! Could not find that pdf file. Apologies about that.')
+            if pdf_file == 'doubledang!':
+              st.error('Double dang! Found more than one file matching that author/title combination. Apologies about that.')
+        with col2:
+          st.subheader("Assessment")
+          ## Include?
+          try:
+            option_include = doc_asdict['revmaster_include']
+            option_include_index = include_options.index(option_include)
+            if option_include == 'Yes':
+              st.success('Paper already assessed as: include', icon = '👌')
+            if option_include == 'No':
+              st.error('Paper already assessed as: exclude', icon = '⛔')
+            if option_include == 'Maybe':
+              st.info('Paper already assessed as: maybe', icon = '❔')
+            with st.expander('See inclusion criteria'):
+              st.write(initial_config.inclusion_criteria)
+            include_widget = st.radio('Include?', include_options, index = option_include_index, horizontal = True, disabled = auth_widgets)
+          except:
+            st.warning('Paper not assessed yet', icon = '⚠️')
+            include_widget = st.radio('Include?', include_options, index = 0, horizontal = True, disabled = auth_widgets)
+            with st.expander('See inclusion criteria'):
+              st.write(initial_config.inclusion_criteria)
+          col1_sidebar, col2_sidebar = st.columns(2)
+          with col1_sidebar:
+            ## Country
+            try:
+              options_country = doc_asdict['revmaster_country']
+              country_widget = st.multiselect('Country', options = country_options, default = options_country, disabled = auth_widgets)
+            except:
+              country_widget = st.multiselect('Country', options = country_options, default = None, disabled = auth_widgets)
+          with col2_sidebar:
+          # Year
+            try:
+              study_year_value = doc_asdict['revmaster_year']            
+            except: 
+              try:
+                study_year_value = int(papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0])
+              except:
+                study_year_value = 0
+            study_year_widget = st.number_input('Year', format = '%d', step = 1, value = study_year_value, disabled = auth_widgets)
+          # Health emergency
+          try: 
+            health_emergency = doc_asdict['revmaster_health_emergency']
+            health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+          except:
+            health_emergency = ''
+            health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+
+
+          # Study type
+          try: 
+            option_study_type = doc_asdict['revmaster_study_type']
+            option_study_type_index = study_type_options.index(option_study_type)
+            study_type_widget = st.radio('Study type', options = study_type_options, index = option_study_type_index, disabled = auth_widgets)
+          except:
+            option_study_type = study_type_options[0]
+            study_type_widget = st.radio('Study type', options = study_type_options, index = 0, disabled = auth_widgets)
+
+          # Methodology
+          if study_type_widget == 'Empirical':
+            with st.expander('See explanation of options'):
+              st.write(methodology_options_empirical_explanation)
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = options_methodology, disabled = auth_widgets)
+            except: 
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = None, disabled = auth_widgets)
+          if study_type_widget == 'Literature review':
+            with st.expander('See explanation of options'):
+                st.write(methodology_options_litrev_explanation)
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = options_methodology, disabled = auth_widgets)
+            except:
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = None, disabled = auth_widgets)
+          if study_type_widget in ['Theoretical', 'Viewpoint/commentary', 'Other']:
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.text_input('Methodological notes', value = options_methodology, disabled = auth_widgets)
+            except:
+              methodology_widget = st.text_input('Methodological notes', value = '')
+
+          # Assessment criteria
+
+          for criterion in initial_config.criteria:
+            criterion_key = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
+            try:
+              criterion_text = doc_asdict[criterion_key]
+              criterion_widget_name = criterion + '_widget'
+              st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
+            except:
+              criterion_text = ''
+              criterion_widget_name = criterion + '_widget'
+              st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
+          save_assessment = st.button("Save", disabled = auth_widgets)
+
+          if save_assessment:
+            savedict = {'revmaster_include': include_widget, 
+                      'revmaster_country': country_widget, 
+                      'revmaster_study_year' : study_year_widget,
+                      'revmaster_study_type' : study_type_widget, 
+                      'revmaster_methodology' : methodology_widget,
+                      'revmaster_health_emergency' : health_emergency_widget}
+            for criterion in initial_config.criteria:
+              criterion_widget_name = criterion + '_widget'
+              criterion_dict_index = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
+              if st.session_state[criterion_widget_name] == '':
+                savedict[criterion_dict_index] = '...'
+              else:
+                savedict[criterion_dict_index] = st.session_state[criterion_widget_name]
+            doc_ref.update(savedict)
+            st.success('Saved!')
+############
+  if enable_analysis_widgets = True:
+    # Tabs
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["Assessment", 'Papers per year', 'Authors', 'Manual tags (= keywords)', 'Analysis (assessments)', 'Analysis (document details)'])
+    ## tab 1 (assessment)###############################################
+    with tab1:
+      # Main area (paper table)
+      ####################################
+      # see: https://discuss.streamlit.io/t/ag-grid-component-with-input-support/8108/242
+      paper = display_table(papers_df)
+      st.divider()
+      try: 
+        paper_key = (paper['selected_rows'][0]['Key'])
+        idx = papers_df[papers_df['Key']== paper_key].index.item()
+        doc_ref = db.collection(initial_config.firestore_collection).document(paper_key)
+        doc = doc_ref.get()
+        doc_asdict = doc.to_dict()
+      except: 
+        paper_key = papers_df.iloc[0]['Key']
+        idx = papers_df[papers_df['Key']== paper_key].index.item()
+
       try:
-        nlp = spacy.load(model)
-      except OSError:
-        print('Downloading language model for the spaCy POS tagger')
-        from spacy.cli import download
-        download(model)
-      nlp = spacy.load(model)
-      return nlp
-    nlp = load_nlp_model('en_core_web_sm')
-    
-    def do_lemma_freq(text):
-      doc = nlp(text)
-      lemmatized_string = []
-      for token in doc:
-        if not token.is_stop and not token.is_punct and not token.is_space and not token.is_digit:
-          lemmatized_string.append(token.lemma_)
-      data = Counter(lemmatized_string)
+        # build file name
+        ## Author
+        authors = papers_df[papers_df['Key'] == paper_key]['Author'].values[0]
+
+        ## Title
+        title = papers_df[papers_df['Key'] == paper_key]['Title'].values[0]
+        show_title = st.subheader(title)
+
+        ## Year
+        year = papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0]
+        year = int(year)
+
+      except:
+        st.text('Select a paper to start the assessment')
+
+      names_for_file = []
+      authorlist = authors.split(';')
+      for x in authorlist:
+        surname = x.split(',')
+        names_for_file.append(surname[0].strip())
+      # Finding pdfs
+      ####################################
+      ## here I apply a rule to determine how many author surnames are used in the filename.
+      names_for_file_parsed = []
+      if len(names_for_file) == 1:
+        names_for_file_parsed.append(names_for_file[0])
+      if len(names_for_file) == 2:
+        names_for_file_parsed.append(names_for_file[0])
+        names_for_file_parsed.append(', ')
+        names_for_file_parsed.append(names_for_file[1])
+      if len(names_for_file) > 2:
+        names_for_file_parsed.append(names_for_file[0])
+        names_for_file_parsed.append(', ')
+        names_for_file_parsed.append(names_for_file[1])
+        names_for_file_parsed.append(' et al')
+      names_for_file_string = ''.join(names_for_file_parsed)
+      auth_and_year = names_for_file_string + ', ' + str(year)
+      st.text(auth_and_year)
+
+      probable_files = []
+      for file in os.listdir('pdfs'):
+        if file.find(names_for_file_string)!= -1:
+            probable_files.append(file)
+
+      # here we specify which file to serve
+      if len(probable_files) == 0:
+        pdf_file = 'dang!'
+      if len(probable_files) == 1:
+        pdf_file = 'pdfs/' + probable_files[0]
+      if len(probable_files) > 1:
+        probable_files_title = []
+        title_as_list = title.split(' ')
+        first_words = title_as_list[0:2]
+        first_words= ' '.join(first_words)
+        for file in probable_files:
+          if file.find(first_words)!= -1:
+            probable_files_title.append(file)
+          if len(probable_files_title) == 0:
+            pdf_file = 'dang!'
+          if len(probable_files_title) == 1:
+            pdf_file = 'pdfs/' + probable_files_title[0]
+          if len(probable_files_title) > 1:
+            pdf_file = 'doubledang!'
+        st.text(probable_files_title)
+      #####################################
+
+      # Display PDF and assessment fields
+      ####################################
+      st.divider()
+      with st.container():
+        col1, col2 = st.columns([3, 2])
+        with col1:
+          if pdf_file not in ['dang!', 'doubledang!']:
+            show_pdf(pdf_file)
+          else:
+            if pdf_file == 'dang!':
+              st.error('Dang! Could not find that pdf file. Apologies about that.')
+            if pdf_file == 'doubledang!':
+              st.error('Double dang! Found more than one file matching that author/title combination. Apologies about that.')
+        with col2:
+          st.subheader("Assessment")
+          ## Include?
+          try:
+            option_include = doc_asdict['revmaster_include']
+            option_include_index = include_options.index(option_include)
+            if option_include == 'Yes':
+              st.success('Paper already assessed as: include', icon = '👌')
+            if option_include == 'No':
+              st.error('Paper already assessed as: exclude', icon = '⛔')
+            if option_include == 'Maybe':
+              st.info('Paper already assessed as: maybe', icon = '❔')
+            with st.expander('See inclusion criteria'):
+              st.write(initial_config.inclusion_criteria)
+            include_widget = st.radio('Include?', include_options, index = option_include_index, horizontal = True, disabled = auth_widgets)
+          except:
+            st.warning('Paper not assessed yet', icon = '⚠️')
+            include_widget = st.radio('Include?', include_options, index = 0, horizontal = True, disabled = auth_widgets)
+            with st.expander('See inclusion criteria'):
+              st.write(initial_config.inclusion_criteria)
+          col1_sidebar, col2_sidebar = st.columns(2)
+          with col1_sidebar:
+            ## Country
+            try:
+              options_country = doc_asdict['revmaster_country']
+              country_widget = st.multiselect('Country', options = country_options, default = options_country, disabled = auth_widgets)
+            except:
+              country_widget = st.multiselect('Country', options = country_options, default = None, disabled = auth_widgets)
+          with col2_sidebar:
+          # Year
+            try:
+              study_year_value = doc_asdict['revmaster_year']            
+            except: 
+              try:
+                study_year_value = int(papers_df[papers_df['Key'] == paper_key]['Publication Year'].values[0])
+              except:
+                study_year_value = 0
+            study_year_widget = st.number_input('Year', format = '%d', step = 1, value = study_year_value, disabled = auth_widgets)
+          # Health emergency
+          try: 
+            health_emergency = doc_asdict['revmaster_health_emergency']
+            health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+          except:
+            health_emergency = ''
+            health_emergency_widget = st.text_input('Health emergency/issue', value = health_emergency, disabled = auth_widgets)
+
+
+          # Study type
+          try: 
+            option_study_type = doc_asdict['revmaster_study_type']
+            option_study_type_index = study_type_options.index(option_study_type)
+            study_type_widget = st.radio('Study type', options = study_type_options, index = option_study_type_index, disabled = auth_widgets)
+          except:
+            option_study_type = study_type_options[0]
+            study_type_widget = st.radio('Study type', options = study_type_options, index = 0, disabled = auth_widgets)
+
+          # Methodology
+          if study_type_widget == 'Empirical':
+            with st.expander('See explanation of options'):
+              st.write(methodology_options_empirical_explanation)
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = options_methodology, disabled = auth_widgets)
+            except: 
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_empirical, default = None, disabled = auth_widgets)
+          if study_type_widget == 'Literature review':
+            with st.expander('See explanation of options'):
+                st.write(methodology_options_litrev_explanation)
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = options_methodology, disabled = auth_widgets)
+            except:
+              methodology_widget = st.multiselect('Methodology', options = methodology_options_litrev, default = None, disabled = auth_widgets)
+          if study_type_widget in ['Theoretical', 'Viewpoint/commentary', 'Other']:
+            try:
+              options_methodology = doc_asdict['revmaster_methodology']
+              methodology_widget = st.text_input('Methodological notes', value = options_methodology, disabled = auth_widgets)
+            except:
+              methodology_widget = st.text_input('Methodological notes', value = '')
+
+          # Assessment criteria
+
+          for criterion in initial_config.criteria:
+            criterion_key = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
+            try:
+              criterion_text = doc_asdict[criterion_key]
+              criterion_widget_name = criterion + '_widget'
+              st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
+            except:
+              criterion_text = ''
+              criterion_widget_name = criterion + '_widget'
+              st.text_area(criterion, criterion_text, key = criterion_widget_name, disabled = auth_widgets)
+          save_assessment = st.button("Save", disabled = auth_widgets)
+
+          if save_assessment:
+            savedict = {'revmaster_include': include_widget, 
+                      'revmaster_country': country_widget, 
+                      'revmaster_study_year' : study_year_widget,
+                      'revmaster_study_type' : study_type_widget, 
+                      'revmaster_methodology' : methodology_widget,
+                      'revmaster_health_emergency' : health_emergency_widget}
+            for criterion in initial_config.criteria:
+              criterion_widget_name = criterion + '_widget'
+              criterion_dict_index = 'revmaster_' + criterion.replace(' ', '_').replace(':', '_')
+              if st.session_state[criterion_widget_name] == '':
+                savedict[criterion_dict_index] = '...'
+              else:
+                savedict[criterion_dict_index] = st.session_state[criterion_widget_name]
+            doc_ref.update(savedict)
+            st.success('Saved!')
+
+    ## tab 2 (papers per year)###############################################
+    with tab2:
+      data = papers_df['Publication Year'].value_counts().rename_axis('Year').to_frame('counts')
+      data = data.sort_values('Year')
+      st.line_chart(data)
+      st.write(data)
+    ## tab 3 (authors)###############################################
+    with tab3:
+      from collections import Counter
+      import matplotlib.pyplot as plt
+      from wordcloud import WordCloud
+      authorlist = []
+      for author_block in papers_df['Author'].values.tolist():
+        try:
+          authors = author_block.split(';')
+          for author in authors:
+            authorlist.append(author.strip())
+        except:
+          authorlist.append(author_block)
+      data = Counter(authorlist)
       data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
-      data_df.columns = ['Keyword', 'count']
+      data_df.columns = ['Author', 'count']
       data_df = data_df.sort_values(by=['count'], ascending = False)
-      data_df.reset_index(inplace=True)
-      data_df.index = data_df.index + 1
-      data_df.drop('index', axis='columns', inplace=True)
-      return(data_df)
-    
-    def do_lemma_wordcloud(df):
-      data = {}
-      for index, row in df.iterrows():
-        data[row['Keyword']] = row['count']
-      wordcloud = WordCloud(background_color="white", width=1600, height=800,  max_words=75).generate_from_frequencies(data)
+      wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
       fig, ax = plt.subplots(figsize = (12, 6))
       ax.imshow(wordcloud, interpolation="bilinear")
       plt.axis("off")
       st.pyplot(fig)
       plt.close(fig)
-      return(data)
-      
-    
-    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
-    n_papers_assessed = len(papers_assessed_df)
-    papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
-    n_papers_included = len(papers_assessed_df_included)
-    papers_assessed_df_excluded = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No']
-    n_papers_excluded = len(papers_assessed_df_excluded)
-    papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
-    n_papers_maybe = len(papers_assessed_df_maybe)
-    st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
-    st.write('Assessed as Maybe: ' + str(n_papers_maybe))
-    st.write('Assessed as Exclude: ' + str(n_papers_excluded))
-    st.divider()
-    
-    revmaster_cols_nlp = initial_config.criteria
-    nlp_columns_dict = {}
-    for x in revmaster_cols_nlp:
-      y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
-      nlp_columns_dict[x] = y
-    for key, item in nlp_columns_dict.items():
-      st.subheader(key)
-      text = papers_assessed_df_included[item].values.tolist()
-      text = [x for x in text if str(x) != 'nan']
-      text = [x for x in text if str(x) != '...']
-      text = ' '.join(text)
-      nlp_col1, nlp_col2 = st.columns([1, 3])
-      with nlp_col1:
-        x = do_lemma_freq(text)
-        st.write(x)
-      with nlp_col2:
-        y = do_lemma_wordcloud(x)
-  ## tab 6 (NLP analysis)###############################################
-  with tab6:
-    import itertools
-    from collections import Counter
-    papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
-    n_papers_assessed = len(papers_assessed_df)
-    papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
-    n_papers_included = len(papers_assessed_df_included)
-    papers_assessed_df_excluded = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No']
-    n_papers_excluded = len(papers_assessed_df_excluded)
-    papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
-    n_papers_maybe = len(papers_assessed_df_maybe)
-    st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
-    st.write('Assessed as Maybe: ' + str(n_papers_maybe))
-    st.write('Assessed as Exclude: ' + str(n_papers_excluded))
-    st.divider()
-    ###Country
-    st.subheader('Country')
-    country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist()))
-    country_count = Counter(country_list)
-    sorted_country_count = dict(sorted(country_count.items(), key=lambda x:x[1], reverse = True))
-    st.bar_chart(sorted_country_count)
-    ###Year
-    st.subheader('Study year')
-    study_year_list = papers_assessed_df_included.revmaster_study_year.values.tolist()
-    study_year_count = Counter(study_year_list)
-    sorted_study_year_count = dict(sorted(study_year_count.items(), key=lambda x:x[1], reverse = True))
-    st.bar_chart(sorted_study_year_count)
-    ###Study type
-    st.subheader('Study Type')
-    study_type_list = papers_assessed_df_included.revmaster_study_type.values.tolist()
-    study_type_count = Counter(study_type_list)
-    sorted_study_type_count = dict(sorted(study_type_count.items(), key=lambda x:x[1], reverse = True))
-    st.bar_chart(sorted_study_type_count)
-    ###Methodology (of empirical studies)
-    st.subheader('Methodology (of empirical studies)')
-    data = papers_assessed_df_included[papers_assessed_df_included['revmaster_study_type'] == 'Empirical']
-    methodology_list = list(itertools.chain(*data.revmaster_methodology.values.tolist()))
-    methodology_count = Counter(methodology_list)
-    sorted_methodology_count = dict(sorted(methodology_count.items(), key=lambda x:x[1], reverse = True))
-    st.bar_chart(sorted_methodology_count) 
-    ###Methodology (of other studies)
+      st.bar_chart(data_df, x = 'Author', y = 'count')
+      st.write(data_df)
+    ## tab 4 (manual tags)###############################################
+    with tab4:
+      st.write('Manual tags include keywords and MeSH terms aggregated in one single column.')
+      st.write('A stoplist is hard-coded in the software, it contains the word \'article\' and it can be customized in the code.')
+      from collections import Counter
+      import matplotlib.pyplot as plt
+      from wordcloud import WordCloud
+      kwlist = []
+      for kw_block in papers_df['Manual Tags'].values.tolist():
+        if isinstance(kw_block, str):
+          kws = kw_block.split(';')
+          for kw in kws:
+            kw_processed = kw.strip().lower().replace('*', '')
+            if kw_processed not in ['article', 'other stopwords']: # this is the stoplist
+              kwlist.append(kw_processed)
+      data = Counter(kwlist)
+      data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
+      data_df.columns = ['Keyword', 'count']
+      data_df = data_df.sort_values(by=['count'], ascending = False)
+      wordcloud = WordCloud(background_color="white", width=1600, height=800).generate_from_frequencies(data)
+      fig, ax = plt.subplots(figsize = (12, 6))
+      ax.imshow(wordcloud, interpolation="bilinear")
+      plt.axis("off")
+      st.pyplot(fig)
+      plt.close(fig)
+      st.bar_chart(data_df, x = 'Keyword', y = 'count')
+      st.write(data_df)
+    ## tab 5 (NLP analysis of assessments)###############################################
+    with tab5:
+      import spacy
+      from collections import Counter
+      import matplotlib.pyplot as plt
+      from wordcloud import WordCloud
+      @st.cache_data
+      def load_nlp_model(model):
+        try:
+          nlp = spacy.load(model)
+        except OSError:
+          print('Downloading language model for the spaCy POS tagger')
+          from spacy.cli import download
+          download(model)
+        nlp = spacy.load(model)
+        return nlp
+      nlp = load_nlp_model('en_core_web_sm')
+
+      def do_lemma_freq(text):
+        doc = nlp(text)
+        lemmatized_string = []
+        for token in doc:
+          if not token.is_stop and not token.is_punct and not token.is_space and not token.is_digit:
+            lemmatized_string.append(token.lemma_)
+        data = Counter(lemmatized_string)
+        data_df = pd.DataFrame.from_dict(data, orient='index').reset_index()
+        data_df.columns = ['Keyword', 'count']
+        data_df = data_df.sort_values(by=['count'], ascending = False)
+        data_df.reset_index(inplace=True)
+        data_df.index = data_df.index + 1
+        data_df.drop('index', axis='columns', inplace=True)
+        return(data_df)
+
+      def do_lemma_wordcloud(df):
+        data = {}
+        for index, row in df.iterrows():
+          data[row['Keyword']] = row['count']
+        wordcloud = WordCloud(background_color="white", width=1600, height=800,  max_words=75).generate_from_frequencies(data)
+        fig, ax = plt.subplots(figsize = (12, 6))
+        ax.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        st.pyplot(fig)
+        plt.close(fig)
+        return(data)
+
+
+      papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+      n_papers_assessed = len(papers_assessed_df)
+      papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
+      n_papers_included = len(papers_assessed_df_included)
+      papers_assessed_df_excluded = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No']
+      n_papers_excluded = len(papers_assessed_df_excluded)
+      papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
+      n_papers_maybe = len(papers_assessed_df_maybe)
+      st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+      st.write('Assessed as Maybe: ' + str(n_papers_maybe))
+      st.write('Assessed as Exclude: ' + str(n_papers_excluded))
+      st.divider()
+
+      revmaster_cols_nlp = initial_config.criteria
+      nlp_columns_dict = {}
+      for x in revmaster_cols_nlp:
+        y = 'revmaster_' + x.replace(' ', '_').replace(':', '_')
+        nlp_columns_dict[x] = y
+      for key, item in nlp_columns_dict.items():
+        st.subheader(key)
+        text = papers_assessed_df_included[item].values.tolist()
+        text = [x for x in text if str(x) != 'nan']
+        text = [x for x in text if str(x) != '...']
+        text = ' '.join(text)
+        nlp_col1, nlp_col2 = st.columns([1, 3])
+        with nlp_col1:
+          x = do_lemma_freq(text)
+          st.write(x)
+        with nlp_col2:
+          y = do_lemma_wordcloud(x)
+    ## tab 6 (NLP analysis)###############################################
+    with tab6:
+      import itertools
+      from collections import Counter
+      papers_assessed_df = load_assessment_data(initial_config.firestore_collection)
+      n_papers_assessed = len(papers_assessed_df)
+      papers_assessed_df_included = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Yes']
+      n_papers_included = len(papers_assessed_df_included)
+      papers_assessed_df_excluded = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'No']
+      n_papers_excluded = len(papers_assessed_df_excluded)
+      papers_assessed_df_maybe = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
+      n_papers_maybe = len(papers_assessed_df_maybe)
+      st.write('Showing lemma frequencies of the assessments of included papers (' + str(n_papers_included) + ' / ' + str(n_papers_assessed) + ').')
+      st.write('Assessed as Maybe: ' + str(n_papers_maybe))
+      st.write('Assessed as Exclude: ' + str(n_papers_excluded))
+      st.divider()
+      ###Country
+      st.subheader('Country')
+      country_list = list(itertools.chain(*papers_assessed_df_included.revmaster_country.values.tolist()))
+      country_count = Counter(country_list)
+      sorted_country_count = dict(sorted(country_count.items(), key=lambda x:x[1], reverse = True))
+      st.bar_chart(sorted_country_count)
+      ###Year
+      st.subheader('Study year')
+      study_year_list = papers_assessed_df_included.revmaster_study_year.values.tolist()
+      study_year_count = Counter(study_year_list)
+      sorted_study_year_count = dict(sorted(study_year_count.items(), key=lambda x:x[1], reverse = True))
+      st.bar_chart(sorted_study_year_count)
+      ###Study type
+      st.subheader('Study Type')
+      study_type_list = papers_assessed_df_included.revmaster_study_type.values.tolist()
+      study_type_count = Counter(study_type_list)
+      sorted_study_type_count = dict(sorted(study_type_count.items(), key=lambda x:x[1], reverse = True))
+      st.bar_chart(sorted_study_type_count)
+      ###Methodology (of empirical studies)
+      st.subheader('Methodology (of empirical studies)')
+      data = papers_assessed_df_included[papers_assessed_df_included['revmaster_study_type'] == 'Empirical']
+      methodology_list = list(itertools.chain(*data.revmaster_methodology.values.tolist()))
+      methodology_count = Counter(methodology_list)
+      sorted_methodology_count = dict(sorted(methodology_count.items(), key=lambda x:x[1], reverse = True))
+      st.bar_chart(sorted_methodology_count) 
+      ###Methodology (of other studies)
 
 
 ## sidebar#######################
