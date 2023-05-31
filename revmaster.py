@@ -599,11 +599,13 @@ else:
       if st.session_state['enable_analysis'] == 'no':
         analysis_widget = st.checkbox('Enable analysis', value = False)
         if analysis_widget:
-          st.message('Enabling analysis features')
+          st.info('Enabling analysis features')
+          st.session_state['enable_analysis'] = 'yes'
       if st.session_state['enable_analysis'] == 'yes':
         analysis_widget = st.checkbox('Enable analysis', value = True)
         if not analysis_widget:
-          st.message('Disabling analysis features')
+          st.info('Disabling analysis features')
+          st.session_state['enable_analysis'] = 'no'
     ## login##
     if 'auth_status' not in st.session_state:
       st.session_state['auth_status'] = 'ro'
