@@ -439,6 +439,10 @@ else:
       data = papers_assessed_df[papers_assessed_df['revmaster_include'] == 'Maybe']
       data = data[['Key', 'Author', 'Publication Year', 'Title']]
       st.write(data)
+      st.subheader('Documents to assess')
+      data = papers_assessed_df.loc[(papers_assessed_df['revmaster_include'] != 'Yes') & (papers_assessed_df['revmaster_include'] != 'No') & (papers_assessed_df['revmaster_include'] != 'maybe')]
+      data = data[['Key', 'Author', 'Publication Year', 'Title']]
+      st.write(data)
 ############
   if enable_analysis_widgets == True:
     # Tabs
