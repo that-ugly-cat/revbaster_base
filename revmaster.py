@@ -821,7 +821,7 @@ else:
   ###sidebar 
   with st.sidebar:
     ## enable analysis functions ##
-    st.info('Analysis feature use memory and computing power. Keep them disabled while assessing papers for a smoother experience.')
+    st.info('Analysis features use memory and computing power. Keep them disabled while assessing papers for a smoother experience.')
     if 'enable_analysis' not in st.session_state:
       st.session_state['enable_analysis'] = 'no'
     if 'enable_analysis' in st.session_state:
